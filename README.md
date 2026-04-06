@@ -26,3 +26,12 @@ playwright install chromium
 1. 點擊 main.py
 
 2. 會在根目錄創建下載資料夾，並自動從官方抓取[N_m3u8DL-RE](https://github.com/nilaoda/N_m3u8DL-RE/releases)
+
+## Optional - Log In  功能
+有些帖子要權限，所以要登入帳號。
+
+執行 `login.py`檔案，在瀏覽器登入後
+
+會在.session自動創建你的cookie.jsopn
+
+在`main.py`中，就能用權限帳號進行登入了
