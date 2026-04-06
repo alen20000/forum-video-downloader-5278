@@ -28,7 +28,7 @@ class DeployDep:
 
     def _ensure_N_m3u8DL_RE(self):
         try:
-            if not config.DONLOADER_PATH.exists():
+            if not config.DOWNLOADER_PATH.exists():
                 print("[!]尚未依賴 N_m3u8DL-RE ")
                 print("[。]自動部屬依賴 N_m3u8DL-RE ")
                 
@@ -63,7 +63,7 @@ class DeployDep:
                 exe_name = next((f for f in z.namelist() if f.endswith(".exe")), None)
 
                 if exe_name:
-                    # 直接讀取該檔案內容並寫入到你的 config.DONLOADER_PATH
+                    # 直接讀取該檔案內容並寫入到你的 config.DOWNLOADER_PATH
                     with open(saving_path, "wb") as f:
                         f.write(z.read(exe_name))
                     print(f"[+] 部署成功: {saving_path}")
