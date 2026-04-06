@@ -40,7 +40,7 @@ class GetData:
 
         with sync_playwright() as p:
 
-            browser =  p.chromium.launch(headless=True) # False 開啟chrome 視窗;True 關閉chrome視窗
+            browser =  p.chromium.launch(headless=True ) # False 開啟chrome 視窗;True 關閉chrome視窗
             context =  browser.new_context()
             page = context.new_page()
 
@@ -49,7 +49,7 @@ class GetData:
             
             print('解析內容')
             _get_title(page.content())
-            page.wait_for_timeout(10000) #等待參數，可以在調適
+            page.wait_for_timeout(5000) #有問題打開
 
     def _download(self):
         '''下載function'''
@@ -63,27 +63,32 @@ class GetData:
             target_url = self.url_list[0]
             output = f'{self.title}.mp4'
             subprocess.run([
-            config.DONLOADER_PATH,  # 跟ffmpeg一樣直接叫名字
+            config.DOWNLOADER_PATH,  # 跟ffmpeg一樣直接叫名字
             target_url,
+            # '--no-log', #關閉log
             '--save-name', self.title,
             '--save-dir',config.DOWNLOAD_FOLDER,  # 目錄參數
-            '--thread-count', str(os.cpu_count()),
+            '--thread-count', str(os.cpu_count()*2),
             '--auto-select',
+            '--download-retry-count',str(10), # 異常後重試次數
             ])
         
         elif url_count > 1:
 
+
             print('目標超過一個')
             for i, m3u8 in enumerate(self.url_list, start=1):
                 target_url = m3u8
-                filr_name = f"{self.title}_{i}"
+                file_name = f"{self.title}_{i}"
                 subprocess.run([
-                config.DONLOADER_PATH,  # 跟ffmpeg一樣直接叫名字
+                config.DOWNLOADER_PATH,  # 跟ffmpeg一樣直接叫名字
                 target_url,
-                '--save-name', filr_name[i],
+                # '--no-log', #關閉log
+                '--save-name', file_name[i],
                 '--save-dir',config.DOWNLOAD_FOLDER,  # 目錄參數
-                '--thread-count', str(os.cpu_count()),
+                '--thread-count', str(os.cpu_count()*2),
                 '--auto-select',
+                '--download-retry-count',str(10), # 異常後重試次數
                 ])
 if __name__ == '__main__':
     url = ''
