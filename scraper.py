@@ -14,8 +14,10 @@ class GetData:
         self.soup = None
         self.url_list =[]
         self.title =None
+        self.wating_secound = 20*1000
         #m3u8 參數
         self.m3u8_thread_count = 8
+        
         #run
         self._run()
         self._download()
@@ -26,7 +28,7 @@ class GetData:
 
 
         def _get_title(page_content):
-            '''抓標題，注意context'''
+            '''抓標題'''
             content = page_content
             soup = BeautifulSoup(content,'html.parser')
 
@@ -42,15 +44,15 @@ class GetData:
         def _ensure_login(browser):
 
             if os.path.exists(config.COOKIE_FILE):
-                print('已經登入')
+                print('[。]登入狀態')
                 return browser.new_context(storage_state=config.COOKIE_FILE)
             else:
-                print('未登入')
+                print('[。]未入狀態')
                 return browser.new_context()
             
         with sync_playwright() as p:
 
-            browser =  p.chromium.launch( headless=True ) # False 開啟chrome 視窗;True 關閉chrome視窗
+            browser =  p.chromium.launch( headless=False) # False 開啟chrome 視窗;True 關閉chrome視窗
 
             context = _ensure_login(browser)
             page = context.new_page()
@@ -58,8 +60,8 @@ class GetData:
             page.on('request', _handle_request) #先監聽request，在進入
             page.goto(self.url, wait_until='domcontentloaded', timeout=60000)
             
-            print('解析內容')
-            page.wait_for_timeout(20*1000) #抓不到調這裡
+            print(f'等待解析時間 {self.wating_secound/1000 } 秒')
+            page.wait_for_timeout(self.wating_secound ) #抓不到調這裡
             _get_title(page.content())
 
 
@@ -69,7 +71,7 @@ class GetData:
         url_count = len(self.url_list)
 
         if not self.url_list:
-            print('[!]沒找到m3u8 URL，無法下載')
+            print('[!]沒找到m3u8 URL')
             return
         if url_count == 1:
             target_url = self.url_list[0]
