@@ -66,7 +66,7 @@ class GetData:
             target_url = self.url_list[0]
             output = f'{self.title}.mp4'
             subprocess.run([
-            'N_m3u8DL-RE',  # 跟ffmpeg一樣直接叫名字
+            config.DONLOADER_PATH,  # 跟ffmpeg一樣直接叫名字
             target_url,
             '--save-name', self.title,
             '--save-dir',config.DOWNLOAD_FOLDER,  # 目錄參數
@@ -81,7 +81,7 @@ class GetData:
                 target_url = m3u8
                 filr_name = f"{self.title}_{i}"
                 subprocess.run([
-                'N_m3u8DL-RE',  # 跟ffmpeg一樣直接叫名字
+                config.DONLOADER_PATH,  # 跟ffmpeg一樣直接叫名字
                 target_url,
                 '--save-name', filr_name[i],
                 '--save-dir',config.DOWNLOAD_FOLDER,  # 目錄參數
