@@ -56,7 +56,7 @@ class DeployDep:
 
             with zipfile.ZipFile(zip_data) as z:
                 '''
-                下面那排語法我看不太懂，直接抄
+
                 功能:尋找zip 內的 exe 
 
                 '''

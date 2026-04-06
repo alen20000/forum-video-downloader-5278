@@ -4,9 +4,7 @@ from playwright.sync_api import sync_playwright
 import subprocess
 import config
 import os
-"""
-https://5278.cc/forum.php?mod=viewthread&tid=1680898&extra=page%3D1%26filter%3Dauthor%26orderby%3Ddateline%26typeid%3D1109
-"""
+
 class GetData:
 
 
@@ -39,7 +37,6 @@ class GetData:
                 if '.m3u8?' in request.url:
                     m3u8_url = request.url
                     self.url_list.append(m3u8_url)
-                    print(self.url_list)
 
         with sync_playwright() as p:
 
