@@ -4,7 +4,7 @@ from playwright.sync_api import sync_playwright
 import subprocess
 import config
 import os
-
+import utils.block_ads
 class GetData:
 
 
@@ -14,7 +14,7 @@ class GetData:
         self.soup = None
         self.url_list =[]
         self.title =None
-        self.wating_secound = 20*1000
+        self.wating_secound = 10*1000
         #m3u8 參數
         self.m3u8_thread_count = 8
         
@@ -52,12 +52,16 @@ class GetData:
             
         with sync_playwright() as p:
 
-            browser =  p.chromium.launch( headless=False) # False 開啟chrome 視窗;True 關閉chrome視窗
+            browser =  p.chromium.launch( headless=True) # False 開啟chrome 視窗;True 關閉chrome視窗
 
             context = _ensure_login(browser)
             page = context.new_page()
 
             page.on('request', _handle_request) #先監聽request，在進入
+
+            interceptor = utils.block_ads.BlockAds() # 過濾器
+            page.route("**/*", interceptor.apply_extreme_filter)
+
             page.goto(self.url, wait_until='domcontentloaded', timeout=60000)
             
             print(f'等待解析時間 {self.wating_secound/1000 } 秒')
