@@ -11,3 +11,6 @@
 * - 動態架構
 
 ## Usage
+1.click main.py
+
+2. 會用到 [N_m3u8DL-RE](https://github.com/nilaoda/N_m3u8DL-RE/releases)，程序會自動下載最新版至根目錄的bin資料夾

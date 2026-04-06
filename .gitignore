@@ -1,7 +1,14 @@
 __pycache__/
-test/
-Downloads/
+
+
+# folder
+/test
+/Downloads
+
+# log files
 Logs/
+/app.log
+
 
 #keep bin folder 
 /bin/*
