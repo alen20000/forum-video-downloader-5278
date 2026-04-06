@@ -1,12 +1,26 @@
 import scraper
+import logging
+import utils.deps as dep
 '''
 論壇:https://5278.cc/
 功能:爬影片
 
 '''
 
+#debug log
+logging.basicConfig(
+    level=logging.ERROR,
+    filename='app.log', # 這裡指定了檔名
+    filemode='a',
+    format='%(name)s - %(levelname)s - %(message)s'
+)
 
 if __name__ == "__main__":
+
+    # dependency checking
+    deploy = dep.DeployDep()
+    deploy.setup_enviroment()
+
     while True:
         url = input("\n請輸入網址 (或輸入 'q' 離開): ")
         
