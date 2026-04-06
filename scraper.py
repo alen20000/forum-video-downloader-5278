@@ -9,12 +9,13 @@ class GetData:
 
 
     def __init__(self,url):
-
+        #屬性
         self.url = url
         self.soup = None
         self.url_list =[]
         self.title =None
-
+        #m3u8 參數
+        self.m3u8_thread_count = 8
         #run
         self._run()
         self._download()
@@ -33,23 +34,34 @@ class GetData:
             self.title = title.split('-')[0].strip()  #正則匹配與去除多餘
             print(self.title)
 
-        def handle_request(request):
+        def _handle_request(request):
                 if '.m3u8?' in request.url:
                     m3u8_url = request.url
                     self.url_list.append(m3u8_url)
 
+        def _ensure_login(browser):
+
+            if os.path.exists(config.COOKIE_FILE):
+                print('已經登入')
+                return browser.new_context(storage_state=config.COOKIE_FILE)
+            else:
+                print('未登入')
+                return browser.new_context()
+            
         with sync_playwright() as p:
 
-            browser =  p.chromium.launch(headless=True ) # False 開啟chrome 視窗;True 關閉chrome視窗
-            context =  browser.new_context()
+            browser =  p.chromium.launch( headless=True ) # False 開啟chrome 視窗;True 關閉chrome視窗
+
+            context = _ensure_login(browser)
             page = context.new_page()
 
-            page.on('request', handle_request) #先監聽request，在進入
+            page.on('request', _handle_request) #先監聽request，在進入
             page.goto(self.url, wait_until='domcontentloaded', timeout=60000)
             
             print('解析內容')
+            page.wait_for_timeout(20*1000) #抓不到調這裡
             _get_title(page.content())
-            page.wait_for_timeout(5000) #有問題打開
+
 
     def _download(self):
         '''下載function'''
@@ -57,7 +69,7 @@ class GetData:
         url_count = len(self.url_list)
 
         if not self.url_list:
-            print('沒找到m3u8 URL，無法下載')
+            print('[!]沒找到m3u8 URL，無法下載')
             return
         if url_count == 1:
             target_url = self.url_list[0]
@@ -68,7 +80,7 @@ class GetData:
             # '--no-log', #關閉log
             '--save-name', self.title,
             '--save-dir',config.DOWNLOAD_FOLDER,  # 目錄參數
-            '--thread-count', str(os.cpu_count()*2),
+            '--thread-count', str(self.m3u8_thread_count),
             '--auto-select',
             '--download-retry-count',str(10), # 異常後重試次數
             ])
@@ -76,7 +88,7 @@ class GetData:
         elif url_count > 1:
 
 
-            print('目標超過一個')
+            print(f'[!]批量模式:下載數量 {len(self.url_list)} 個影片')
             for i, m3u8 in enumerate(self.url_list, start=1):
                 target_url = m3u8
                 file_name = f"{self.title}_{i}"
@@ -84,9 +96,9 @@ class GetData:
                 config.DOWNLOADER_PATH,  # 跟ffmpeg一樣直接叫名字
                 target_url,
                 # '--no-log', #關閉log
-                '--save-name', file_name[i],
+                '--save-name', file_name,
                 '--save-dir',config.DOWNLOAD_FOLDER,  # 目錄參數
-                '--thread-count', str(os.cpu_count()*2),
+                '--thread-count', str(self.m3u8_thread_count),
                 '--auto-select',
                 '--download-retry-count',str(10), # 異常後重試次數
                 ])
