@@ -10,7 +10,19 @@
 * - 批量下載
 * - 動態架構
 
+## Requirement
+1. 打開CMD，安裝套件
+```
+pip install -r requirements.txt
+```
+2. 安裝給爬蟲套件用的 chorme 瀏覽器
+```
+playwright install chromium
+```
 ## Usage
-1.click main.py
 
-2. 會用到 [N_m3u8DL-RE](https://github.com/nilaoda/N_m3u8DL-RE/releases)，程序會自動下載最新版至根目錄的bin資料夾
+
+
+1. 點擊 main.py
+
+2. 會在根目錄創建下載資料夾，並自動從官方抓取[N_m3u8DL-RE](https://github.com/nilaoda/N_m3u8DL-RE/releases)
