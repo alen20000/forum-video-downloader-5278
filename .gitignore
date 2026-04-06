@@ -2,3 +2,9 @@ __pycache__/
 test/
 Downloads/
 Logs/
+
+#keep bin folder 
+/bin/*
+!bin/.gitkeep
+
+#
