@@ -22,6 +22,9 @@ if __name__ == "__main__":
     deploy.setup_enviroment()
 
     while True:
+        print('-'*60 )
+        print('Target Site:https://5278.cc/')
+        print('-'*60 )  
         url = input("\n請輸入網址 (或輸入 'q' 離開):\n ")
         
         if url.lower() == 'q':
