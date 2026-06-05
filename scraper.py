@@ -5,6 +5,8 @@ import subprocess
 import config
 import os
 import utils.block_ads
+
+
 class GetData:
 
 
@@ -14,7 +16,7 @@ class GetData:
         self.soup = None
         self.url_list =[]
         self.title =None
-        self.wating_secound = 10*1000
+        self.wating_secound = 20*1000
         #m3u8 參數
         self.m3u8_thread_count = 8
         
@@ -52,14 +54,17 @@ class GetData:
             
         with sync_playwright() as p:
 
-            browser =  p.chromium.launch( headless=True) # False 開啟chrome 視窗;True 關閉chrome視窗
+            # 選擇:False 開啟chrome 視窗;True 關閉chrome視窗
+            browser =  p.chromium.launch( headless=False)
 
             context = _ensure_login(browser)
             page = context.new_page()
 
-            page.on('request', _handle_request) #先監聽request，在進入
-
-            interceptor = utils.block_ads.BlockAds() # 過濾器
+            #目的:先埋下監聽器（當網頁發出任何網路請求時，自動丟給 _handle_request 處理）
+            page.on('request', _handle_request) 
+            
+            # 過濾廣告
+            interceptor = utils.block_ads.BlockAds() 
             page.route("**/*", interceptor.apply_extreme_filter)
 
             page.goto(self.url, wait_until='domcontentloaded', timeout=60000)
@@ -108,6 +113,9 @@ class GetData:
                 '--auto-select',
                 '--download-retry-count',str(10), # 異常後重試次數
                 ])
+
+
+#debug用
 if __name__ == '__main__':
-    url = ''
+    url = 'https://5278.cc/forum.php?mod=viewthread&tid=1695641&extra=page%3D3'
     start = GetData(url)
