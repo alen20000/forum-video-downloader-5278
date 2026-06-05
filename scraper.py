@@ -39,7 +39,11 @@ class GetData:
             print(self.title)
 
         def _handle_request(request):
-                if '.m3u8?' in request.url:
+            '''過濾器'''    
+                #條件1."m3u8"結尾
+            if '.m3u8' in request.url:
+                #條件2.資源類型是xhr(過濾混淆的檔案)
+                if request.resource_type == 'xhr':
                     m3u8_url = request.url
                     self.url_list.append(m3u8_url)
 
