@@ -35,3 +35,7 @@ playwright install chromium
 會在.session自動創建你的cookie.jsopn
 
 在`main.py`中，就能用權限帳號進行登入了
+
+## Changelog
+
+2026.6.6  因應網站反爬升級，而更改代碼的監聽策略
