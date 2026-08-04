@@ -46,15 +46,20 @@ class Scraper:
         '''模擬瀏覽器行為、抓取m3u8 url'''
         #啟動 Playwright 環境
         with sync_playwright() as p:
+
             #啟動 chrome 瀏覽器 (headless=True 關閉瀏覽器; headless=False 開啟瀏覽器)
-            browser =  p.chromium.launch( headless=False)
+            if self.config['chrome']['chrome_show']:
+                browser =  p.chromium.launch( headless=False)
+            elif  not self.config['chrome']['chrome_show']:
+                browser = p.chromium.launch( headless=True)
+
             # 打開新頁
             self.page = browser.new_page()
             # on 方法監聽 請求 事件時觸發過濾與捕捉
             self.page.on('request', self._handle_request) 
             self.page.route("**/*", apply_extreme_filter)
 
-            self.page.goto(self.url, wait_until='domcontentloaded', timeout=60000)
+            self.page.goto(self.url, wait_until='domcontentloaded', timeout=self.config['chrome']['wait_for_timeout'])
             self.page_content = self.page.content()
             self.page.wait_for_timeout(self.config['chrome']['wait_for_timeout'])
 
@@ -89,6 +94,27 @@ class Scraper:
                     print(f"影片{self.video_title}下載失敗，預期外錯誤")
                 
             elif total_files > 1:
+                try:
+
+                    for i,m3u8 in enumerate(self.urls_list, start=1):
+                        download_url = m3u8
+                        video_title = f"{self.video_title}_{i}.mp4"
+                        subprocess.run([
+                            config.DOWNLOADER_PATH,
+                            download_url,
+                            # '--no-log', #logging for debug
+                            '--save-name', video_title, 
+                            '--save-dir',config.DOWNLOAD_FOLDER,    
+                            '--thread-count', str(self.config["downloader_setting"]["thread_count"]),
+                            self.config["downloader_setting"]["download_mode"], 
+                            '--download-retry-count',str(self.config["downloader_setting"]["retry-count"]), 
+                        ])
+                    pass
+                except subprocess.CalledProcessError as e:
+                    print(f"影片{self.video_title}下載失敗，錯誤原因:{e}")
+                    logging.error(f'影片{self.video_title}下載失敗，錯誤原因:{e}')
+                except Exception as e:
+                    print(f"影片{self.video_title}下載失敗，預期外錯誤")
 
 
 

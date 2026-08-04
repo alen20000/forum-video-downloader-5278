@@ -1,10 +1,10 @@
 #chrome parameter 
 chrome:
-  #單位為秒
+  #導向頁面的最多等待時間。(毫秒)
+  wait_for_timeout: 50000
+  #強制等待時間。(秒)
   pre-waiting-time: 10
-  #單位為毫秒
-  wait_for_timeout: 5000
-
+  chrome_show : True
 
 block_setting:
   blocked_types: 
@@ -23,3 +23,6 @@ downloader_setting:
 
   download_mode: "--auto-select"
   retry-count: 10
+
+url:
+  5278_site: "https://5278.cc"
