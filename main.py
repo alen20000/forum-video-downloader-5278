@@ -3,6 +3,7 @@ import src.utils.logger as logger
 import src.config as config
 from src.engine.auth_check import login_auth
 import src.utils.deps as deps
+import logging
 if __name__ == "__main__":
     #pre-porcess
     logger.setup_logging()
@@ -34,4 +35,4 @@ if __name__ == "__main__":
             scraper.url = url
             scraper.run()
         except Exception as e:
-            logger.error(f'錯誤原因:{e}')
+            logging.error(f'錯誤原因:{e}')
