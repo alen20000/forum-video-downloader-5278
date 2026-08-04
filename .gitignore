@@ -6,8 +6,8 @@ __pycache__/
 /Downloads
 
 # log files
-Logs/
-/app.log
+logs/
+log/
 
 
 #keep bin folder 

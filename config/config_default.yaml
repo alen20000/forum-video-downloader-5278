@@ -16,3 +16,10 @@ block_setting:
     - google-analytics.com
     - doubleclick.net
     - adsystem.com
+  
+downloader_setting:
+  #設定線程數，太慢或被鎖時可調整
+  thread_count: 8
+
+  download_mode: "--auto-select"
+  retry-count: 10

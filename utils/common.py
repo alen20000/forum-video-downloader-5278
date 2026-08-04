@@ -1,5 +1,8 @@
 from pathlib import Path
 import yaml
+import src.config as config
+
+
 
 
 def load_ymal(file_path: Path) -> dict:
