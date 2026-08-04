@@ -1,7 +1,7 @@
-import src.engine.engine.scraper  as sc
+import src.engine.scraper  as sc
 import src.utils.logger as logger
 import src.config as config
-from src.engine.engine.auth_check import login_auth
+from src.engine.auth_check import login_auth
 import src.utils.deps as deps
 if __name__ == "__main__":
     #pre-porcess
