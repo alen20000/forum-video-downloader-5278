@@ -90,7 +90,7 @@ class Scraper:
                     subprocess.run([
                         config.DOWNLOADER_FILE_PATH,
                         download_url,
-                        '--no-log', #logging for debug
+                        '--no-log', 
                         '--save-name', video_title, 
                         '--save-dir',config.DOWNLOAD_FOLDER,    
                         '--thread-count', str(self.config["downloader_setting"]["thread_count"]),
