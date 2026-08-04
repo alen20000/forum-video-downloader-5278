@@ -1,0 +1,6 @@
+#chrome parameter 
+chrome:
+  #單位為秒
+  pre-waiting-time: 10
+  #單位為毫秒
+  wait_for_timeout: 5000

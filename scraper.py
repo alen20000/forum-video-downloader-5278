@@ -16,8 +16,9 @@ class GetData:
         self.soup = None
         self.url_list =[]
         self.title =None
-        self.wating_secound = 20*1000
-        #m3u8 參數
+        self.wating_secound = 10*1000
+        
+        #m3u8 thread parameter，預設8線程下載
         self.m3u8_thread_count = 8
         
         #run
@@ -59,7 +60,7 @@ class GetData:
         with sync_playwright() as p:
 
             # 選擇:False 開啟chrome 視窗;True 關閉chrome視窗
-            browser =  p.chromium.launch( headless=False)
+            browser =  p.chromium.launch( headless=True)
 
             context = _ensure_login(browser)
             page = context.new_page()
