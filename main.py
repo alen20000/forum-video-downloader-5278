@@ -1,48 +1,37 @@
-import scraper
-import logging
-import utils.deps as dep
-'''
-論壇:https://5278.cc/
-功能:爬影片
-
-'''
-
-#debug log
-logging.basicConfig(
-    level=logging.ERROR,
-    filename='app.log', # 這裡指定了檔名
-    filemode='a',
-    format='%(name)s - %(levelname)s - %(message)s'
-)
-
+import src.engine.engine.scraper  as sc
+import src.utils.logger as logger
+import src.config as config
+from src.engine.engine.auth_check import login_auth
+import src.utils.deps as deps
 if __name__ == "__main__":
+    #pre-porcess
+    logger.setup_logging()
+    dev_status = deps.DeployDep().run()
+    if dev_status:
+        print("[+]依賴安裝成功")
+    #check cookie
+    if  not config.COOKIE_FILE.exists():
+        print("是否需要登入狀態?[y/n] [Enter預設為y]")
+        input_status = input().strip().lower()
+        if input_status in ('y',''):
+            login_auth()
+        else:
+            print("[!]若無登入狀態下，部分影片可能法進入")
 
-    # dependency checking
-    deploy = dep.DeployDep()
-    deploy.setup_enviroment()
-
+    #main process
     while True:
-        print('-'*60 )
-        print('Target Site:https://5278.cc/')
-        print('-'*60 )  
-        url = input("\n請輸入網址 (或輸入 'q' 離開):\n ")
-        
-        if url.lower() == 'q':
-            print("程式結束。")
-            break
-            
-        if not url.strip():
-            print("網址不能為空，請重新輸入。")
-            continue     
         try:
-            # 執行你的爬蟲邏輯
-            scraper.GetData(url)
-            print("-" * 30)
-            print("該網址處理完成！")
+            print('-'*60 )
+            print('影片論壇網址:https://5278.cc/')
+            print('-'*60 )  
+            url = input("\n請輸入網址(或輸入 'q' 離開):\n ")
             
-        except Exception as e:
-            # 這樣萬一其中一個網址報錯，迴圈才不會直接崩潰退出
-            print(f"發生錯誤: {e}")
-            print("請檢查網址是否正確，或網站是否阻擋了連線。")
+            if url.lower() == 'q':
+                print("程式結束。")
+                break
 
-    input("按 Enter 鍵完全退出視窗...")
+            scraper = sc.Scraper()
+            scraper.url = url
+            scraper.run()
+        except Exception as e:
+            logger.error(f'錯誤原因:{e}')

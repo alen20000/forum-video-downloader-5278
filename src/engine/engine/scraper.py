@@ -35,7 +35,7 @@ class Scraper:
         if  not self.url:
             logging.info("你沒輸入網址")
             return False
-        
+
         #Execute
         self.fetch_web_metadate()
         self.video_title = self.fetch_Video_title()
@@ -84,42 +84,24 @@ class Scraper:
 
                 for i,m3u8 in enumerate(self.urls_list, start=1):
                     download_url = m3u8
+                    #用三元運算子就可以少寫很多代碼
                     video_title = f"{self.video_title}.mp4" if total_files == 1 else f"{self.video_title}_{i}.mp4"
+                    print(f"下載中...{video_title}")
                     subprocess.run([
-                        config.DOWNLOADER_PATH,
+                        config.DOWNLOADER_FILE_PATH,
                         download_url,
-                        # '--no-log', #logging for debug
+                        '--no-log', #logging for debug
                         '--save-name', video_title, 
                         '--save-dir',config.DOWNLOAD_FOLDER,    
                         '--thread-count', str(self.config["downloader_setting"]["thread_count"]),
                         self.config["downloader_setting"]["download_mode"], 
                         '--download-retry-count',str(self.config["downloader_setting"]["retry-count"]), 
                     ])
-                pass
+
             except subprocess.CalledProcessError as e:
                 print(f"影片{self.video_title}下載失敗，錯誤原因:{e}")
                 logging.error(f'影片{self.video_title}下載失敗，錯誤原因:{e}')
             except Exception as e:
-                print(f"影片{self.video_title}下載失敗，預期外錯誤")
+                logging.error(f'影片{self.video_title}下載失敗，預期外錯誤')
 
 
-            # if total_files == 1:
-            #     download_url = self.urls_list[0]
-            #     video_title = f"{self.video_title}.mp4"
-            #     try:
-            #     #     subprocess.run([
-            #     #         config.DOWNLOADER_PATH,
-            #     #         download_url,
-            #     #         # '--no-log', #logging for debug
-            #     #         '--save-name', video_title,
-            #     #         '--save-dir',config.DOWNLOAD_FOLDER,
-            #     #         '--thread-count', str(self.config["downloader_setting"]["thread_count"]),
-            #     #         self.config["downloader_setting"]["download_mode"],
-            #     #         '--download-retry-count',str(self.config["downloader_setting"]["retry-count"]),
-            #     #     ])
-            #     # except subprocess.CalledProcessError as e:
-            #     #     print(f"影片{self.video_title}下載失敗，錯誤原因:{e}")
-            #     #     logging.error(f'影片{self.video_title}下載失敗，錯誤原因:{e}')
-            #     # except Exception as e:
-            #     #     print(f"影片{self.video_title}下載失敗，預期外錯誤")
-                

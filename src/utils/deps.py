@@ -1,80 +1,55 @@
-import os
-import config
-from pathlib import Path
 import logging
+import src.config as config
+
 
 class DeployDep:
-    
+    '''
+    安裝依賴
+    '''
 
     def __init__(self):
         
         self.save_path = config.DOWNLOAD_FOLDER
+        self.config_dev = None
 
+    def run(self):
+        #檢查"bin"資料夾
+        if not config.DOWNLOADER_FOLDER_PATH.exists():
+            config.DOWNLOADER_FOLDER_PATH.mkdir(parents=True, exist_ok=True)
+        #檢查是否安裝，沒有則跳出
+        if not config.DOWNLOADER_FILE_PATH.exists():
+            logging.info("[!]尚未必要依賴依賴，開始部屬『N_m3u8DL-RE』 ")
 
-    def setup_enviroment(self):
-        self._ensure_folder()
-        self._ensure_N_m3u8DL_RE()
+            import requests
+            import zipfile
+            import io
+            from src.utils.common import load_ymal
+            # 讀取 config
+            self.config_dev = load_ymal(config.CONFIG_DEV)
+            binary_url = self.config_dev['N_m3u8DL-RE']['download_link']
 
-    def _ensure_folder(self):
-        try:
-            if not self.save_path.exists():
-                self.save_path.mkdir(parents=True, exist_ok=True)
-                print("未發現下載資料夾，建立資料夾。。。")
-            else:
-                pass
-        except OSError as e:
-            logging.error(f'建立失敗:{e}')
-            raise
+            try:
+                res = requests.get(binary_url)
+                #若狀態不對，會跳到最近的excep，或直接報錯。主要是避免抓到空檔案然後還解壓縮
+                res.raise_for_status()
+                #下載的檔案直接給記憶體，不給實體地址
+                zip_data = io.BytesIO(res.content)
+                #在記憶體曾用zip解壓
+                with zipfile.ZipFile(zip_data) as z:
+                    #把符合exe檔名的檔案取出；neext為只取第一個
+                    exe_name = next((f for f in z.namelist() if f.endswith(".exe")), None)
 
-    def _ensure_N_m3u8DL_RE(self):
-        try:
-            if not config.DOWNLOADER_PATH.exists():
-                print("[!]尚未依賴 N_m3u8DL-RE ")
-                print("[。]自動部屬依賴 N_m3u8DL-RE ")
-                
-                #自動抓取
-                self._download_dependency()
-            else:
-                pass
-        except OSError as e:
-            logging.error(f'建立失敗:{e}')
-            raise
+                    if exe_name:
+                        with open(config.DOWNLOADER_FILE_PATH, "wb") as f:
+                            f.write(z.read(exe_name))
 
-    def _download_dependency(self) -> None:
-        import requests
-        import zipfile
-        import io
-        info = config.DEPENDENCIES.get("N_m3u8DL-RE")
-        target_url = info.get("url")
-        saving_path = info.get("saving_path")
+                        return True
+                    else:
+                        raise FileNotFoundError("壓縮檔內找不到執行檔 (.exe)")
+            except Exception as e:
+                logging.error(f'下載失敗，錯誤原因:{e}')
+                return False
+        #不需要安裝依賴
+        else:
+            return False 
 
-        try:
-            response = requests.get(target_url, timeout=60, stream=True)
-            response.raise_for_status()
-
-            zip_data = io.BytesIO(response.content) #直接抓到記憶體
-
-            with zipfile.ZipFile(zip_data) as z:
-                '''
-
-                功能:尋找zip 內的 exe 
-
-                '''
-                exe_name = next((f for f in z.namelist() if f.endswith(".exe")), None)
-
-                if exe_name:
-                    # 直接讀取該檔案內容並寫入到你的 config.DOWNLOADER_PATH
-                    with open(saving_path, "wb") as f:
-                        f.write(z.read(exe_name))
-                    print(f"[+] 部署成功: {saving_path}")
-                else:
-                    raise FileNotFoundError("壓縮檔內找不到執行檔 (.exe)")
-                
-
-        except Exception as e:
-            print(f"[!]下載失敗:{e}")
-            raise
-
-if __name__ == "__main__":
-    deploy = DeployDep()
-    deploy.setup_enviroment()
