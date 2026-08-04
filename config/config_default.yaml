@@ -1,7 +1,7 @@
 #chrome parameter 
 chrome:
   #導向頁面的最多等待時間。(毫秒)
-  wait_for_timeout: 50000
+  wait_for_timeout: 10000
   #強制等待時間。(秒)
   pre-waiting-time: 10
   chrome_show : True

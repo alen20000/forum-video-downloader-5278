@@ -14,6 +14,8 @@ class Scraper:
         self.urls_list =[]
         self.video_title =None
         self.config = None
+        # Playwright 實例屬性
+        self.context = None
         self.page = None
         self.page_content = None
 
@@ -30,8 +32,11 @@ class Scraper:
             self.config = load_ymal(config.CONFIG_DEFAULT)
         else:
             pass
-
-        logging.error(f'影片')
+        if  not self.url:
+            logging.info("你沒輸入網址")
+            return False
+        
+        #Execute
         self.fetch_web_metadate()
         self.video_title = self.fetch_Video_title()
         self.trigger_download()
@@ -52,15 +57,18 @@ class Scraper:
                 browser =  p.chromium.launch( headless=False)
             elif  not self.config['chrome']['chrome_show']:
                 browser = p.chromium.launch( headless=True)
-
+            self.context  = browser.new_context(storage_state=config.COOKIE_FILE)
             # 打開新頁
-            self.page = browser.new_page()
+            self.page = self.context.new_page()
             # on 方法監聽 請求 事件時觸發過濾與捕捉
             self.page.on('request', self._handle_request) 
+            #攔截垃圾廣告
             self.page.route("**/*", apply_extreme_filter)
 
             self.page.goto(self.url, wait_until='domcontentloaded', timeout=self.config['chrome']['wait_for_timeout'])
+            #捕獲網頁內容
             self.page_content = self.page.content()
+            #給瀏覽器時間捕獲動態資源(單位毫秒)
             self.page.wait_for_timeout(self.config['chrome']['wait_for_timeout'])
 
     def trigger_download(self):
@@ -68,61 +76,50 @@ class Scraper:
         total_files = len(self.urls_list)
 
         if not total_files :
-            print("沒有可下載的檔案")
+            logging.info(f"影片{self.video_title}下載失敗，找不到影片")
             return False
         else:
-            print(f"總共有 {total_files} 個影片準備下載")
+            logging.info(f"總共有 {total_files} 個影片準備下載")
+            try:
 
-            if total_files == 1:
-                download_url = self.urls_list[0]
-                video_title = f"{self.video_title}.mp4"
-                try:
+                for i,m3u8 in enumerate(self.urls_list, start=1):
+                    download_url = m3u8
+                    video_title = f"{self.video_title}.mp4" if total_files == 1 else f"{self.video_title}_{i}.mp4"
                     subprocess.run([
                         config.DOWNLOADER_PATH,
                         download_url,
                         # '--no-log', #logging for debug
-                        '--save-name', video_title,
-                        '--save-dir',config.DOWNLOAD_FOLDER,
+                        '--save-name', video_title, 
+                        '--save-dir',config.DOWNLOAD_FOLDER,    
                         '--thread-count', str(self.config["downloader_setting"]["thread_count"]),
-                        self.config["downloader_setting"]["download_mode"],
-                        '--download-retry-count',str(self.config["downloader_setting"]["retry-count"]),
+                        self.config["downloader_setting"]["download_mode"], 
+                        '--download-retry-count',str(self.config["downloader_setting"]["retry-count"]), 
                     ])
-                except subprocess.CalledProcessError as e:
-                    print(f"影片{self.video_title}下載失敗，錯誤原因:{e}")
-                    logging.error(f'影片{self.video_title}下載失敗，錯誤原因:{e}')
-                except Exception as e:
-                    print(f"影片{self.video_title}下載失敗，預期外錯誤")
+                pass
+            except subprocess.CalledProcessError as e:
+                print(f"影片{self.video_title}下載失敗，錯誤原因:{e}")
+                logging.error(f'影片{self.video_title}下載失敗，錯誤原因:{e}')
+            except Exception as e:
+                print(f"影片{self.video_title}下載失敗，預期外錯誤")
+
+
+            # if total_files == 1:
+            #     download_url = self.urls_list[0]
+            #     video_title = f"{self.video_title}.mp4"
+            #     try:
+            #     #     subprocess.run([
+            #     #         config.DOWNLOADER_PATH,
+            #     #         download_url,
+            #     #         # '--no-log', #logging for debug
+            #     #         '--save-name', video_title,
+            #     #         '--save-dir',config.DOWNLOAD_FOLDER,
+            #     #         '--thread-count', str(self.config["downloader_setting"]["thread_count"]),
+            #     #         self.config["downloader_setting"]["download_mode"],
+            #     #         '--download-retry-count',str(self.config["downloader_setting"]["retry-count"]),
+            #     #     ])
+            #     # except subprocess.CalledProcessError as e:
+            #     #     print(f"影片{self.video_title}下載失敗，錯誤原因:{e}")
+            #     #     logging.error(f'影片{self.video_title}下載失敗，錯誤原因:{e}')
+            #     # except Exception as e:
+            #     #     print(f"影片{self.video_title}下載失敗，預期外錯誤")
                 
-            elif total_files > 1:
-                try:
-
-                    for i,m3u8 in enumerate(self.urls_list, start=1):
-                        download_url = m3u8
-                        video_title = f"{self.video_title}_{i}.mp4"
-                        subprocess.run([
-                            config.DOWNLOADER_PATH,
-                            download_url,
-                            # '--no-log', #logging for debug
-                            '--save-name', video_title, 
-                            '--save-dir',config.DOWNLOAD_FOLDER,    
-                            '--thread-count', str(self.config["downloader_setting"]["thread_count"]),
-                            self.config["downloader_setting"]["download_mode"], 
-                            '--download-retry-count',str(self.config["downloader_setting"]["retry-count"]), 
-                        ])
-                    pass
-                except subprocess.CalledProcessError as e:
-                    print(f"影片{self.video_title}下載失敗，錯誤原因:{e}")
-                    logging.error(f'影片{self.video_title}下載失敗，錯誤原因:{e}')
-                except Exception as e:
-                    print(f"影片{self.video_title}下載失敗，預期外錯誤")
-
-
-
-
-
-
-if __name__ == "__main__":
-
-    scarper = Scraper()
-    scarper.url = input("輸入網址:google.com.tw")
-    scarper.run()
