@@ -11,13 +11,13 @@ class Scraper:
 
     def __init__(self):
         self.url = None
-        self.urls_list =[]
+        self.urls_list: list[str]  =[]
         self.video_title =None
-        self.config = None
+        self.config: dict  = None
         # Playwright 實例屬性
         self.context = None
         self.page = None
-        self.page_content = None
+        self.page_content: str | None = None
 
     def _handle_request(self, request):
         '''Filter and add to the list; only URLs matching m3u8 and xhr styles will be added.'''
@@ -86,7 +86,7 @@ class Scraper:
                     download_url = m3u8
                     #用三元運算子就可以少寫很多代碼
                     video_title = f"{self.video_title}.mp4" if total_files == 1 else f"{self.video_title}_{i}.mp4"
-                    print(f"下載中...{video_title}")
+                    logging.info(f"下載中...{video_title}")
                     subprocess.run([
                         config.DOWNLOADER_FILE_PATH,
                         download_url,
@@ -99,7 +99,7 @@ class Scraper:
                     ])
 
             except subprocess.CalledProcessError as e:
-                print(f"影片{self.video_title}下載失敗，錯誤原因:{e}")
+
                 logging.error(f'影片{self.video_title}下載失敗，錯誤原因:{e}')
             except Exception as e:
                 logging.error(f'影片{self.video_title}下載失敗，預期外錯誤')
