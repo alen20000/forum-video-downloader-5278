@@ -1,10 +1,8 @@
+from src.utils.common import load_ymal
+from src.config import CONFIG_DEFAULT
 
 
-# 定義要封鎖的資源類型
-BLOCKED_TYPES = {"image", "font", "media", "stylesheet"}
-    
-# 定義廣告商網域黑名單
-AD_DOMAINS = ["google-analytics.com", "doubleclick.net", "adsystem.com"]
+config = load_ymal(CONFIG_DEFAULT)
 
 def apply_extreme_filter(route):
     """
@@ -13,12 +11,13 @@ def apply_extreme_filter(route):
     req = route.request
     
     # 1. 根據資源類型攔截
-    if req.resource_type in BLOCKED_TYPES:
+    if req.resource_type in config['block_setting']['blocked_types']:
         return route.abort()
         
     # 2. 根據 URL 關鍵字攔截
-    if any(domain in req.url for domain in AD_DOMAINS):
+    if any(domain in req.url for domain in config['block_setting']['ad_domains']):
         return route.abort()
 
     # 3. 其他通訊則放行
     return route.continue_()
+

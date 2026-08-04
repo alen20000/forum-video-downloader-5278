@@ -4,3 +4,15 @@ chrome:
   pre-waiting-time: 10
   #單位為毫秒
   wait_for_timeout: 5000
+
+
+block_setting:
+  blocked_types: 
+    - image
+    - font
+    - media
+    - stylesheet
+  ad_domains: 
+    - google-analytics.com
+    - doubleclick.net
+    - adsystem.com
