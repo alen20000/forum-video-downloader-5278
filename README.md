@@ -9,7 +9,6 @@
 
 ```bash
 pip install -r requirements.txt
-playwright install chromium
 ```
 
 ## Usage
@@ -17,7 +16,7 @@ playwright install chromium
 ```bash
 python main.py
 ```
-- [!]只支援windows作業系統
+- [!]只能在windows運行
 - 第一次運行會自動安裝依賴
 - 可選擇是否要登入帳號
 - 貼上論壇帖子地址，等待程序動態解析取得 HLS 串流描述檔
